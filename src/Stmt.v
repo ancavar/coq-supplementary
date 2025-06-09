@@ -516,7 +516,24 @@ Module SmallStep.
         (STEP : c -- s --> (Some s', c'))
         (EXEC : c' == s' ==> c'') :
     c == s ==> c''.
-Proof. admit. Admitted.
+  Proof.
+    dependent induction s generalizing c c' c''; inversion STEP; subst.
+      eapply bs_Seq.
+      apply ss_bs_base. exact SSTEP.
+      apply EXEC.
+    inversion EXEC; subst.
+      eapply bs_Seq.
+      apply (IHs1 _ _ _ _ SSTEP).
+      eexact STEP1.
+      assumption.
+    apply bs_If_True.
+      apply SCVAL.
+      assumption.
+    apply bs_If_False.
+      apply SCVAL.
+      assumption.
+    apply SmokeTest.while_unfolds. apply EXEC.
+  Qed.
   
   Theorem bs_ss_eq (s : stmt) (c c' : conf) :
     c == s ==> c' <-> c -- s -->> c'.
